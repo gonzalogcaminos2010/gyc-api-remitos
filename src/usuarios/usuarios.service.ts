@@ -49,6 +49,11 @@ export class UsuariosService {
     return this.usuariosRepository.save(usuario);
   }
 
+  async findOneByEmail(email: string): Promise<Usuario | undefined> {
+    return this.usuariosRepository.findOne({ where: { email } });
+  }
+
+
 
 
 }
