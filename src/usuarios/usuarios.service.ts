@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger  } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Usuario } from './usuario.entity';
@@ -7,6 +7,8 @@ import { UpdateUsuarioDto } from './dto/update-usuario.dto'; // Asegúrate de cr
 
 @Injectable()
 export class UsuariosService {
+  private readonly logger = new Logger(UsuariosService.name);
+
 
   constructor(
     @InjectRepository(Usuario)
@@ -49,8 +51,17 @@ export class UsuariosService {
     return this.usuariosRepository.save(usuario);
   }
 
+  
+
   async findOneByEmail(email: string): Promise<Usuario | undefined> {
-    return this.usuariosRepository.findOne({ where: { email } });
+    this.logger.log(`Buscando usuario con email: ${email}`);
+    const usuario = await this.usuariosRepository.findOne({ where: { email } });
+    if (usuario) {
+      this.logger.log(`Usuario encontrado: ${usuario.nombre}`);
+    } else {
+      this.logger.warn(`Usuario no encontrado con email: ${email}`);
+    }
+    return usuario;
   }
 
 

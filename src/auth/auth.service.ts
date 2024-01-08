@@ -1,8 +1,11 @@
+// src/auth/auth.service.ts
+
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsuariosService } from '../usuarios/usuarios.service';
-import { Usuario } from '../usuarios/usuario.entity';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
+import { CreateUsuarioDto } from '../usuarios/dto/create-usuario.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -11,19 +14,33 @@ export class AuthService {
     private jwtService: JwtService
   ) {}
 
-  async validateUser(email: string, pass: string): Promise<Omit<Usuario, 'password'> | null> {
-    const user = await this.usuariosService.findOneByEmail(email);
-    if (user && bcrypt.compareSync(pass, user.password)) {
-      const { password, ...result } = user;
-      return result;
-    }
-    return null;
+  async register(createUsuarioDto: CreateUsuarioDto) {
+    const hashedPassword = await bcrypt.hash(createUsuarioDto.password, 10);
+    const newUser = {
+      ...createUsuarioDto,
+      password: hashedPassword,
+    };
+    return this.usuariosService.create(newUser);
   }
 
-  async login(user: any) {
-    const payload = { username: user.nombre, sub: user.id, email: user.email };
+  async login(loginDto: LoginDto) {
+    const { email, password } = loginDto;
+
+    const user = await this.usuariosService.findOneByEmail(email);
+    if (!user) {
+      throw new Error('Usuario no encontrado');
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new Error('Contraseña inválida');
+    }
+
+    const payload = { email: user.email, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
     };
   }
 }
+
+  // ...

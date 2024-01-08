@@ -15,6 +15,8 @@ export class Usuario {
 
   @Column()
   password: string; // Considera almacenar una versión hash del password
+
+  isActive: boolean;
   
   @OneToMany(() => Remito, remito => remito.creador)
   remitosCreados: Remito[];

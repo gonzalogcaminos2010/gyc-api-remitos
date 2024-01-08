@@ -8,6 +8,7 @@ import { Usuario } from './usuarios/usuario.entity'; // Importa la entidad Usuar
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { AuthModule } from './auth/auth.module';
 
+
 @Module({
   imports: [
     RemitosModule,
@@ -15,7 +16,7 @@ import { AuthModule } from './auth/auth.module';
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',
-      port: 3307,
+      port: 3306,
       username: 'root',
       password: '',
       database: 'gyc-remitos',
@@ -23,6 +24,7 @@ import { AuthModule } from './auth/auth.module';
       synchronize: true,
     }),
     AuthModule,
+    
   ],
   controllers: [AppController],
   providers: [AppService],
