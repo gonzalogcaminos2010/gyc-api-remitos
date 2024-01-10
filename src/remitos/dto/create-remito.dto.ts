@@ -3,5 +3,7 @@ export class CreateRemitoDto {
     readonly entregadoPor: string;
     readonly recibidoPor: string;
     readonly fechaEntrega: Date;
+    origenId: number;
+  destinoId: number;
   }
   

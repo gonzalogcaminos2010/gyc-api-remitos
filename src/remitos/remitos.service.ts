@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Remito } from './remito.entity';
+import { Lugar } from './lugar.entity'; // Asegúrate de que el path sea correcto
 import { CreateRemitoDto } from './dto/create-remito.dto';
 import { UpdateRemitoDto } from './dto/update-remito.dto';
 
@@ -10,31 +11,74 @@ export class RemitosService {
   constructor(
     @InjectRepository(Remito)
     private remitosRepository: Repository<Remito>,
+    @InjectRepository(Lugar)
+    private lugarRepository: Repository<Lugar>,
   ) {}
 
   async findAll(): Promise<Remito[]> {
-    return this.remitosRepository.find();
+    return this.remitosRepository.find({ relations: ['origen', 'destino'] });
   }
 
   async findOne(id: number): Promise<Remito> {
-    return this.remitosRepository.findOne({ where: { id } });
+    const remito = await this.remitosRepository.findOne({ where: { id }, relations: ['origen', 'destino'] });
+    if (!remito) {
+      throw new NotFoundException(`Remito with ID ${id} not found`);
+    }
+    return remito;
   }
 
   async create(createRemitoDto: CreateRemitoDto): Promise<Remito> {
-    const remito = this.remitosRepository.create(createRemitoDto);
+    const origen = await this.lugarRepository.findOne({ where: { id: createRemitoDto.origenId } });
+    const destino = await this.lugarRepository.findOne({ where: { id: createRemitoDto.destinoId } });
+
+    if (!origen || !destino) {
+      throw new NotFoundException('Origen or destino not found');
+    }
+
+    const remito = this.remitosRepository.create({
+      ...createRemitoDto,
+      origen,
+      destino,
+    });
+
     return this.remitosRepository.save(remito);
   }
 
   async update(id: number, updateRemitoDto: UpdateRemitoDto): Promise<Remito> {
-    await this.remitosRepository.update(id, updateRemitoDto);
-    return this.remitosRepository.findOne({ where: { id } });
+    const remito = await this.remitosRepository.preload({
+      id: id,
+      ...updateRemitoDto,
+    });
+
+    if (!remito) {
+      throw new NotFoundException(`Remito with ID ${id} not found`);
+    }
+
+    if (updateRemitoDto.origenId) {
+      const origen = await this.lugarRepository.findOne({ where: { id: updateRemitoDto.origenId } });
+      if (!origen) {
+        throw new NotFoundException(`Origen with ID ${updateRemitoDto.origenId} not found`);
+      }
+      remito.origen = origen;
+    }
+
+    if (updateRemitoDto.destinoId) {
+      const destino = await this.lugarRepository.findOne({ where: { id: updateRemitoDto.destinoId } });
+      if (!destino) {
+        throw new NotFoundException(`Destino with ID ${updateRemitoDto.destinoId} not found`);
+      }
+      remito.destino = destino;
+    }
+
+    return this.remitosRepository.save(remito);
   }
 
   async delete(id: number): Promise<void> {
-    await this.remitosRepository.delete(id);
+    const result = await this.remitosRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Remito with ID ${id} not found`);
+    }
   }
 
-  async findByUsuarioId(usuarioId: number): Promise<Remito[]> {
-    return this.remitosRepository.find({ where: { creador: { id: usuarioId } } });
-  }
+  // Cualquier otro método que necesites
 }

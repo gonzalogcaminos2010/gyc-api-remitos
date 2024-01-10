@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 import { Usuario } from '../usuarios/usuario.entity';
+import { Lugar } from 'src/lugares/entities/lugar.entity';
 
 @Entity()
 export class Remito {
@@ -17,6 +18,12 @@ export class Remito {
 
   @Column()
   fechaEntrega: Date;
+
+  @ManyToOne(() => Lugar)
+  origen: Lugar;
+
+  @ManyToOne(() => Lugar)
+  destino: Lugar;
 
   @ManyToOne(() => Usuario, usuario => usuario.remitosCreados)
   creador: Usuario;

@@ -7,6 +7,8 @@ import { Remito } from './remitos/remito.entity';
 import { Usuario } from './usuarios/usuario.entity'; // Importa la entidad Usuario
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { AuthModule } from './auth/auth.module';
+import { LugaresModule } from './lugares/lugares.module';
+import { Lugar } from './lugares/entities/lugar.entity';
 
 
 @Module({
@@ -20,10 +22,11 @@ import { AuthModule } from './auth/auth.module';
       username: 'root',
       password: '',
       database: 'gyc-remitos',
-      entities: [Remito, Usuario], // Incluye ambas entidades aquí
+      entities: [Remito, Usuario, Lugar],
       synchronize: true,
     }),
     AuthModule,
+    LugaresModule,
     
   ],
   controllers: [AppController],
