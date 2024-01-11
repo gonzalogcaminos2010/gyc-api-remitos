@@ -14,11 +14,11 @@ export class RemitosController {
   async findAll(): Promise<Remito[]> {
     return await this.remitosService.findAll();
   }
-  @UseGuards(JwtAuthGuard) // Protege esta ruta con JWT
+/*   @UseGuards(JwtAuthGuard) // Protege esta ruta con JWT
   @Get('usuario/:usuarioId')
   findByUsuarioId(@Param('usuarioId') usuarioId: number) {
     return this.remitosService.findByUsuarioId(usuarioId);
-  }
+  } */
   @UseGuards(JwtAuthGuard) // Protege esta ruta con JWT
   @Get(':id')
   async findOne(@Param('id') id: number): Promise<Remito> {

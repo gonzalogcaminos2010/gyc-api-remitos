@@ -1,9 +1,9 @@
-export class CreateRemitoDto {
-    readonly articulos: Record<string, number | string>;
-    readonly entregadoPor: string;
-    readonly recibidoPor: string;
-    readonly fechaEntrega: Date;
-    origenId: number;
-  destinoId: number;
-  }
-  
+  export class CreateRemitoDto {
+      readonly articulos: Record<string, number | string>;
+      readonly entregadoPor: string;
+      readonly recibidoPor: string;
+      readonly fechaEntrega: Date;
+      readonly origenId: number;
+    readonly destinoId: number;
+    }
+    

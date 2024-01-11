@@ -2,9 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Remito } from './remito.entity';
-import { Lugar } from './lugar.entity'; // Asegúrate de que el path sea correcto
+
 import { CreateRemitoDto } from './dto/create-remito.dto';
 import { UpdateRemitoDto } from './dto/update-remito.dto';
+import { Lugar } from 'src/lugares/entities/lugar.entity';
 
 @Injectable()
 export class RemitosService {
